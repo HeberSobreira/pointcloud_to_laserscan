@@ -168,7 +168,6 @@ namespace pointcloud_to_laserscan
     {
       output.ranges.assign(ranges_size, output.range_max + inf_epsilon_);
     }
-    output.intensities.assign(ranges_size, 0.0); //TODO Verify if intensity field exist
 
     sensor_msgs::PointCloud2ConstPtr cloud_out;
     sensor_msgs::PointCloud2Ptr cloud;
@@ -191,6 +190,11 @@ namespace pointcloud_to_laserscan
     else
     {
       cloud_out = cloud_msg;
+    }
+
+    sensor_msgs::PointCloud2ConstIterator<float>iter_intensity(*cloud_out, "intensity"); //Check for intensities field
+    if(iter_intensity!=iter_intensity.end()){
+        output.intensities.assign(ranges_size, 0.0);
     }
 
     // Iterate through pointcloud
@@ -238,7 +242,7 @@ namespace pointcloud_to_laserscan
       if (range < output.ranges[index])
       {
         output.ranges[index] = range;
-        if(iter_intensity != iter_intensity.end())
+        if(index<output.intensities.size())
         {
           output.intensities[index] = *iter_intensity;
         }
